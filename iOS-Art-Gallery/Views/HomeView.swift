@@ -11,22 +11,13 @@ struct HomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
+                header
                 recommendationSection
                 Text("Explore the universe")
                     .font(.title3.bold())
                 menuGrid
             }
             .padding()
-        }
-        .navigationTitle("Potter Wiki")
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    viewModel.fetchRecommendation()
-                } label: {
-                    Label("Refresh", systemImage: "arrow.clockwise")
-                }
-            }
         }
         .alert("Potter Wiki", isPresented: $viewModel.isAlertVisible) {
             Button("OK", role: .cancel) { }
@@ -57,6 +48,23 @@ struct HomeView: View {
             } else {
                 PlaceholderRecommendationView(isLoading: false)
             }
+        }
+    }
+
+    private var header: some View {
+        HStack(alignment: .center) {
+            Text("Potter Wiki")
+                .font(.largeTitle.bold())
+            Spacer()
+            Button {
+                viewModel.fetchRecommendation()
+            } label: {
+                Label("Refresh", systemImage: "arrow.clockwise")
+                    .labelStyle(.iconOnly)
+                    .font(.title3)
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
         }
     }
 
