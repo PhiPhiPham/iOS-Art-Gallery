@@ -133,10 +133,15 @@ struct BookDetailView: View {
             default:
                 LazyVStack(spacing: 12) {
                     ForEach(viewModel.chapters) { chapter in
+                        let summary = chapter.summary?.trimmingCharacters(in: .whitespacesAndNewlines)
+                        let readableSummary = (summary?.isEmpty ?? true) ? nil : summary
+                        let hasSummary = readableSummary != nil
                         ChapterRow(
                             chapter: chapter,
-                            isExpanded: expandedChapterIDs.contains(chapter.id)
+                            summary: readableSummary,
+                            isExpanded: hasSummary ? expandedChapterIDs.contains(chapter.id) : false
                         ) {
+                            guard hasSummary else { return }
                             toggleChapter(chapter.id)
                         }
                     }
@@ -172,35 +177,21 @@ struct BookDetailView: View {
 
 private struct ChapterRow: View {
     let chapter: PotterChapter
+    let summary: String?
     let isExpanded: Bool
     let onToggle: () -> Void
 
+    private var hasSummary: Bool {
+        !(summary?.isEmpty ?? true)
+    }
+
     var body: some View {
         VStack(spacing: 0) {
-            Button(action: onToggle) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(chapter.title)
-                            .font(.headline)
-                            .lineLimit(2)
-                        Text(chapter.order.map { "Chapter \($0)" } ?? "Chapter")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    Image(systemName: "chevron.down")
-                        .rotationEffect(.degrees(isExpanded ? 180 : 0))
-                        .foregroundStyle(.secondary)
-                        .animation(.easeInOut(duration: 0.2), value: isExpanded)
-                }
-                .padding(.vertical, 8)
-            }
-            .buttonStyle(.plain)
-
-            if isExpanded {
+            header
+            if hasSummary, isExpanded {
                 Divider()
                     .padding(.horizontal, -16)
-                Text(chapter.summary ?? "No summary available")
+                Text(summary ?? "")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .padding(.vertical, 10)
@@ -217,6 +208,33 @@ private struct ChapterRow: View {
             RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(Color.black.opacity(0.05))
         )
+    }
+
+    @ViewBuilder
+    private var header: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(chapter.title)
+                    .font(.headline)
+                    .lineLimit(2)
+                Text(chapter.order.map { "Chapter \($0)" } ?? "Chapter")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            if hasSummary {
+                Image(systemName: "chevron.down")
+                    .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                    .foregroundStyle(.secondary)
+                    .animation(.easeInOut(duration: 0.2), value: isExpanded)
+            }
+        }
+        .padding(.vertical, 8)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            guard hasSummary else { return }
+            onToggle()
+        }
     }
 }
 
