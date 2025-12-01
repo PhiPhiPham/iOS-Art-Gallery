@@ -6,15 +6,10 @@ struct RecommendationCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Today's recommendation")
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.9))
-                    Text(recommendation.title)
-                        .font(.title3.bold())
-                        .foregroundStyle(.white)
-                        .lineLimit(2)
-                }
+                Text(recommendation.title)
+                    .font(.title3.bold())
+                    .foregroundStyle(.white)
+                    .lineLimit(2)
                 Spacer()
                 Image(systemName: recommendation.category.systemIconName)
                     .font(.title2)

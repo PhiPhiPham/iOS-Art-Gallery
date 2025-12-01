@@ -12,6 +12,8 @@ struct HomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 header
+                Text("Today's recommendation")
+                    .font(.title3.bold())
                 recommendationSection
                 Text("Explore the universe")
                     .font(.title3.bold())
