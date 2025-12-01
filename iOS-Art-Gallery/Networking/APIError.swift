@@ -19,13 +19,13 @@ enum APIError: LocalizedError {
         case .invalidURL:
             return "We were unable to build a valid request."
         case .invalidResponse:
-            return "The museum responded with something unexpected. Please try again."
+            return "The wizarding archive responded with something unexpected. Please try again."
         case .decoding:
-            return "We couldn't read the artworks from the response."
+            return "We couldn't read the data from the response."
         case .transport:
-            return "We couldn't reach the museum. Check your connection."
+            return "We couldn't reach the wizarding archive. Check your connection."
         case .emptyData:
-            return "The museum did not send back any artworks."
+            return "No entries were returned from the archive."
         }
     }
 }

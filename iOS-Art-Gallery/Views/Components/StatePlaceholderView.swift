@@ -40,12 +40,12 @@ struct StatePlaceholderView: View {
 
     private var iconName: String {
         switch kind {
-        case .empty: return "photo.on.rectangle.angled"
+        case .empty: return "sparkles"
         case .error: return "exclamationmark.triangle"
         }
     }
 }
 
 #Preview {
-    StatePlaceholderView(kind: .empty, title: "No Artworks", message: "Try another search")
+    StatePlaceholderView(kind: .empty, title: "No Content", message: "Try another search")
 }

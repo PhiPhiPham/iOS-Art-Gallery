@@ -11,7 +11,7 @@ import SwiftUI
 struct iOS_Art_GalleryApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView(viewModel: GalleryViewModel())
+            ContentView()
         }
     }
 }
