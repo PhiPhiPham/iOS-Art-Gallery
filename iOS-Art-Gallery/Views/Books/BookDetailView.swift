@@ -2,6 +2,7 @@ import SwiftUI
 
 struct BookDetailView: View {
     @StateObject private var viewModel: BookDetailViewModel
+    @State private var expandedChapterIDs: Set<String> = []
 
     init(book: PotterBook) {
         _viewModel = StateObject(wrappedValue: BookDetailViewModel(book: book))
@@ -132,7 +133,12 @@ struct BookDetailView: View {
             default:
                 LazyVStack(spacing: 12) {
                     ForEach(viewModel.chapters) { chapter in
-                        chapterCard(chapter)
+                        ChapterRow(
+                            chapter: chapter,
+                            isExpanded: expandedChapterIDs.contains(chapter.id)
+                        ) {
+                            toggleChapter(chapter.id)
+                        }
                     }
                 }
             }
@@ -153,22 +159,64 @@ struct BookDetailView: View {
         .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 5)
     }
 
-    private func chapterCard(_ chapter: PotterChapter) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(chapter.order.map { "Chapter \($0)" } ?? "Chapter")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                Spacer()
+    private func toggleChapter(_ id: String) {
+        withAnimation(.easeInOut(duration: 0.2)) {
+            if expandedChapterIDs.contains(id) {
+                expandedChapterIDs.remove(id)
+            } else {
+                expandedChapterIDs.insert(id)
             }
-            Text(chapter.title)
-                .font(.headline)
-            Text(chapter.summary ?? "No summary available")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
         }
-        .padding()
-        .background(RoundedRectangle(cornerRadius: 16).fill(Color(.secondarySystemBackground)))
+    }
+}
+
+private struct ChapterRow: View {
+    let chapter: PotterChapter
+    let isExpanded: Bool
+    let onToggle: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Button(action: onToggle) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(chapter.title)
+                            .font(.headline)
+                            .lineLimit(2)
+                        Text(chapter.order.map { "Chapter \($0)" } ?? "Chapter")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.down")
+                        .rotationEffect(.degrees(isExpanded ? 180 : 0))
+                        .foregroundStyle(.secondary)
+                        .animation(.easeInOut(duration: 0.2), value: isExpanded)
+                }
+                .padding(.vertical, 8)
+            }
+            .buttonStyle(.plain)
+
+            if isExpanded {
+                Divider()
+                    .padding(.horizontal, -16)
+                Text(chapter.summary ?? "No summary available")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 10)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 4)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.secondarySystemBackground))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(Color.black.opacity(0.05))
+        )
     }
 }
 
