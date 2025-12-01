@@ -32,17 +32,15 @@ struct CharacterListView: View {
     private var list: some View {
         List {
             Section {
-                letterFilter
+                Picker("Sort order", selection: $viewModel.sortOrder) {
+                    ForEach(CharacterListViewModel.SortOrder.allCases) { order in
+                        Text(order.rawValue).tag(order)
+                    }
+                }
+                .pickerStyle(.segmented)
             }
 
-            if viewModel.filteredCharacters.isEmpty && !viewModel.items.isEmpty {
-                Text("No characters in this range yet.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .padding(.vertical, 8)
-            }
-
-            ForEach(viewModel.filteredCharacters) { character in
+            ForEach(viewModel.items) { character in
                 NavigationLink(value: character) {
                     CharacterRowView(character: character)
                 }
@@ -64,34 +62,6 @@ struct CharacterListView: View {
         .refreshable {
             await viewModel.refreshAsync()
         }
-    }
-
-    private var letterFilter: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(CharacterListViewModel.LetterGroup.allCases) { group in
-                    let isSelected = viewModel.letterGroup == group
-                    Button {
-                        viewModel.letterGroup = group
-                    } label: {
-                        Text(group.rawValue)
-                            .font(.caption.bold())
-                            .padding(.vertical, 6)
-                            .padding(.horizontal, 12)
-                            .background(
-                                Capsule()
-                                    .fill(isSelected ? Color.accentColor.opacity(0.2) : Color(.secondarySystemBackground))
-                            )
-                            .overlay(
-                                Capsule().stroke(isSelected ? Color.accentColor : Color.clear, lineWidth: 1)
-                            )
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .padding(.vertical, 4)
-        }
-        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
     }
 }
 
